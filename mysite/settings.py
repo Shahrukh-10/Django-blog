@@ -28,7 +28,7 @@ SECRET_KEY = "g$^es%8u#lfpok*09f_34h=!zqt5$6$amd$_m@u#$&gven#g(g"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["127.0.0.1","paraboy-blog.herokuapp.com"]
+ALLOWED_HOSTS = ["127.0.0.1","paraboyblog.herokuapp.com"]
 
 
 # Application definition
