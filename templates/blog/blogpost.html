@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %} Blog {% endblock title %}
+
+{% block body %}
+{% load humanize %}
+{% load get_dict %}
+{% for message in messages %}
+  <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+    <strong>Message : </strong>{{message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %}
+
+<div class='container'>
+  <article class="blog-post">
+    <h2 class="blog-post-title">{{post.Title}}</h2>
+    <hr>
+    <p class="blog-post-meta">{{post.ts}} by <a href="/about">{{post.Author}}</a></p>
+
+    <pre style='text-align:left'>{{post.Content}}</pre>
+    <hr>
+  </article>
+</div>
+<div class="container">
+  <h2>Comments ({{comments.count}})</h2>
+
+  {% if user.is_authenticated %}
+  <form action="/blog/postComment" method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+            <label for="exampleInputEmail1">Post Comment </label>
+            <input type="text" required class="form-control" name="comment" placeholder="Enter comment here">
+            <input type="hidden" name="parentsno" value="{{comment.sno}}" >
+
+      <br>
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <input type="hidden" name="postsno" value="{{post.sno}}" >
+      </div>
+  </form>
+  {% else %}
+  <p>User must be logged in to post comments </p>
+  {% endif %}
+{% for comment in comments %}
+    <div class="row my-3">
+        <div class="col-md-1  ">
+        <img class="rounded mx-auto d-block w-100 p-2 border border-black" style='padding:10px' src="/static/img/user.png"  alt="user">
+        </div>
+        <div class="col-md-11 "> 
+        <b> {{comment.user.username}} </b>  <span style='font-size:12px;padding-left:5px'> {{comment.timestamp | naturaltime}} </span>
+        <div>   {{comment.comment}} </div>
+        <div class="replyBox mx-0">
+          <p>
+            <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#replyBox{{comment.sno}}" aria-expanded="false" aria-controls="replyBox{{comment.sno}}">
+              Reply
+            </button>
+          </p>
+          <div class="collapse" id="replyBox{{comment.sno}}">
+            <div class="card card-body my-2">
+            {% if user.is_authenticated %}
+              <form action="/blog/postComment" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                      <label for="exampleInputEmail1">Post a Reply </label>
+                      <input type="text" class="form-control" name="comment" placeholder="Enter comment here">
+                      <input type="hidden" name="parentsno" value="{{comment.sno}}" >
+
+                <br>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <input type="hidden" name="postsno" value="{{post.sno}}" >
+                </div>
+              </form>
+            </div>
+            {% else %}
+                <p>User must be logged in to post a reply </p>
+          {% endif %}
+          </div>
+          <div class="replies"> 
+          <h6 style='font-size:10px'>Replies {{repdict.count}}</h6>
+              {% for reply in repdict|get_val:comment.sno %}
+               <div class='row'>
+                <div class="col-md-1  ">
+                  <img class="rounded mx-auto d-block w-100 p-2 border border-black" style='padding:10px' src="/static/img/user.png"  alt="user">
+                </div>
+                <div class="col-md-1  ">
+                  {{reply.comment}}
+                  <br>
+                </div>
+              </div>
+              {% endfor %} 
+            </div>
+        </div>
+    </div>
+    </div>
+    {% endfor %}
+
+
+</div>
+
+{% endblock body %}
